@@ -10,9 +10,9 @@ Making maps is awesome and there are a ton of options/packages in R we can utili
 
 Today, we are going to keep it simple and focus on the following
 
--   What is an sf object?
+-   What is an sf object? **SPACIAL FEATURE ... geometry column**
 
--   Gradient vs Discrete Coloring
+-   Gradient **DARKER SHADES** vs Discrete Coloring **BIN**
 
 -   Using familiar packages, `ggplot` and `plotly` to make a world map
 

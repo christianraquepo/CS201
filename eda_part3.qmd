@@ -247,7 +247,7 @@ ggplot(studentdata, aes(y = writing_score)) +
 ```{r}
 ```
 
-#### Line Graphs 
+#### Line Graphs
 
 ```{r}
 ggplot(studentdata, aes(x = parent_educ, y = math_score)) + 
