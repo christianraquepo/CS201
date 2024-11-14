@@ -1,6 +1,6 @@
 ---
 title: "Treatment Mapping"
-format: pdf
+format: html
 editor: visual
 ---
 
@@ -206,7 +206,7 @@ interactive_completed_treatment_map <- ggplot(percent_completed_by_state_map) +
   theme_minimal()
 
 # Use `girafe` to render the interactive plot
-#girafe(ggobj = interactive_completed_treatment_map)
+girafe(ggobj = interactive_completed_treatment_map)
 
 ```
 
@@ -259,8 +259,129 @@ ggplot(percent_completed_by_state_map) +
    theme_minimal() 
 ```
 
-1.  How does the percentage of treatments being completed & percentage of treatments ending with no use vary by the service (completed_cases) and length of stay. (services_d) Create at least 3 visualizations to try and answer this question
+```{r}
+percent_no_use_discharge <- teds_d_select %>%
+  group_by(stfips) %>%
+  summarize(
+    total_cases = n(),
+    completed_cases = sum(reason == "completed", na.rm = TRUE),
+    completed_no_use_discharge = sum(freq1_d == "no use" & reason == "completed", na.rm = TRUE)
+  ) %>%
+  mutate(percentage_no_use = (completed_no_use_discharge / completed_cases) * 100)
+```
 
 ```{r}
+percent_no_use_discharge$stfips_recode <- sprintf('%02d',percent_no_use_discharge$stfips)
+```
 
+```{r}
+colnames(percent_no_use_discharge)[colnames(percent_no_use_discharge) == "stfips_recode"] <- "state_fips"
+```
+
+```{r}
+percent_no_use_discharge_map <- full_join(percent_no_use_discharge,
+                          states_map,
+                          by = "state_fips")
+```
+
+```{r}
+interactive_no_use_discharge_map <- ggplot(percent_no_use_discharge_map) +
+  geom_sf_interactive(
+    mapping = aes(
+      geometry = geometry,
+      fill = percentage_no_use,
+      tooltip = paste("State FIPS:", stfips, "<br>Completed with no use:", round(percentage_no_use, 2), "%", "<br>State:", state_name)
+    ),
+    color = "#ffffff",
+    size = 0.1
+  ) +
+  labs(fill = "% of Completed Treatment Resulting in No Use",
+       title = "Completed Treatments that end with No Use at Discharge") +
+  coord_sf(datum = NA) +
+  theme_minimal() +
+  theme(
+    panel.background = element_blank(),
+    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5)
+  ) 
+
+interactive_no_use_discharge_map
+```
+
+```{r}
+interactive_no_use_discharge_map <- ggplot(percent_completed_by_state_map) +
+  geom_sf_interactive(
+    mapping = aes(
+      geometry = geometry,
+      fill = percentage_completed,
+      tooltip = paste("State FIPS:", stfips, "State Name:", state_name, "<br>Completed:", percentage_completed, "%")
+    ),
+    color = "#ffffff",
+    size = 0.25
+  ) +
+  labs(fill = "% of Completed Treatment Resulting in No Use",
+       title = "Completed Treatments that end with No Use at Discharge") +
+  coord_sf(datum = NA) +
+  theme_minimal()
+
+# Use `girafe` to render the interactive plot
+girafe(ggobj = interactive_no_use_discharge_map)
+```
+
+1.  How does the **percentage of treatments being [completed]{.underline}** & **percentage of treatments ending with no use [vary by the service]{.underline}** (completed_cases) and [**length of stay**]{.underline}. (services_d) Create at least 3 visualizations to try and answer this question
+    1.  group_by service or LOS, etc.
+
+```{r}
+summary(as.factor(teds_d_select$services_d))
+```
+
+```{r}
+summary(as.factor(teds_d_select$los))
+```
+
+```{r}
+percent_completed_w_services <- teds_d_select %>%
+  group_by(stfips, services_d) %>%
+  summarize(
+    total_cases = n(),
+    completed_cases = sum(reason == "completed", na.rm = TRUE)
+  ) %>%
+  mutate(percent_complete_by_service = (completed_cases / total_cases) * 100)
+
+nlevels(as.factor(percent_completed_w_services$stfips)) # checking to see that all stfips are represented
+
+percent_completed_w_services$state_fips <- sprintf('%02d', percent_completed_w_services$stfips)
+
+percent_completed_w_services_map <- full_join(percent_completed_w_services,
+                          states_map,
+                          by = "state_fips")
+
+ggplot(percent_completed_w_services_map, aes(x = state_abbv, y = completed_cases, fill = services_d)) +
+  geom_bar(stat = "identity") +
+   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ggplot(percent_completed_w_services_map, aes(x = state_abbv, y = completed_cases)) +
+  geom_point(stat = "identity") +
+   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ggplot(percent_completed_w_services_map, aes(x = state_abbv, y = completed_cases)) +
+  geom_histogram(stat = "identity") +
+   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+percent_completed_w_services <- teds_d_select %>%
+  group_by(services_d) %>%
+  summarize(
+    total_cases = n(),
+    completed_cases = sum(reason == "completed", na.rm = TRUE)
+  ) %>%
+  mutate(percent_complete_by_service = (completed_cases / total_cases) * 100)
+
+ggplot(percent_completed_w_services, aes(x = percent_complete_by_service, y = services_d, fill = services_d)) +
+  geom_bar(stat = "identity") 
 ```
