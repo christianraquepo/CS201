@@ -1,0 +1,168 @@
+---
+title: "Exploratory Data Analysis, part 3"
+author: "Amber Camp"
+date: "`r Sys.Date()`"
+format: html
+editor: visual
+---
+
+## Exploratory Data Analysis Part 3
+
+Continuing on from Parts 1 and 2. Start by loading libraries. We'll load data as we go.
+
+## Libraries
+
+```{r, message=FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+library(ggplot2)
+```
+
+## Data
+
+We'll start with `diamonds`, which we explored last class. Neither of the below are necessary, since you can automatically access diamonds as long as the right packages are loaded. But here is what you'd do save diamonds to your environment and then open it up for viewing.
+
+```{r, message=FALSE}
+diamonds <- diamonds
+view(diamonds)
+```
+
+## Let's make plots!
+
+We've spent a fair bit of time looking at scatter plots, histograms, and boxplots. Here is when to use what, as well as some basic code. Keep this for reference. You'll need it for the rest of the semester :)
+
+#### Scatterplots:
+
+Use scatterplots to explore or compare the correlation between two continuous variables.
+
+```{r}
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point()
+```
+
+#### Density plots
+
+Use density plots to visualize distributions of a continuous variable. Can be used to examine relationships between a continuous variable and an ordered, discrete, or continuous variable.
+
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_density()
+```
+
+#### Line graphs
+
+Use line graphs when comparing counts or percentages of responses (for example) to levels of an ordered factor, or when the dependent variable is continuous and the independent variable is ordered.
+
+```{r}
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_line(stat = "summary", fun = mean, group = 1)
+```
+
+#### Bar charts a.k.a. bar plots
+
+Use when you want to visualize counts for one or more discrete variable. When you want to plot numeric dependent variables, a boxplot is generally more useful.
+
+```{r}
+ggplot(diamonds, aes(x = cut)) +
+  geom_bar()
+```
+
+#### Histograms
+
+Use when showing counts for an ordered or continuous dependent variable. If you want to examine the effects of an independent variable with more than two factor levels, you probably want a line graph instead.
+
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = .1) # don't forget binwidth!
+```
+
+#### Frequency Polygons
+
+Use when you want to visualize the distribution of a continuous variable and prefer a line plot over a histogram. This can help show trends or patterns more clearly. Remember, you read this like you would read a histogram!
+
+```{r}
+ggplot(diamonds, aes(x = carat)) + # this one displays counts
+  geom_freqpoly(aes(color = cut), binwidth = .1, linewidth = 0.75)
+
+ggplot(diamonds, aes(x = carat, y = after_stat(density))) + # this one displays density
+  geom_freqpoly(aes(color = cut), binwidth = .1, linewidth = 0.75)
+```
+
+#### Box plots
+
+We talked about these a lot last class :)
+
+```{r}
+ggplot(diamonds, aes(y = carat)) +
+  geom_boxplot()
+
+ggplot(diamonds, aes (x = cut, y = price)) +
+  geom_boxplot()
+```
+
+#### Violin plots
+
+Use when you want to visualize the distribution of a continuous variable across different categories and also show density. Violin plots allow you to see the distribution shape, central tendency, and variability of the data.
+
+```{r}
+ggplot(diamonds, aes(x = cut, y = carat)) + # this is called a count plot
+  geom_violin()
+```
+
+#### Count plot
+
+Use when you want to visualize the relationship between two categorical variables or one categorical and one continuous variable, particularly when you want to show the number of observations at each combination of levels.
+
+```{r}
+ggplot(diamonds, aes(x = cut, y = carat)) + # this is called a count plot
+  geom_count()
+
+ggplot(diamonds, aes(x = cut, y = color)) +
+  geom_count()
+```
+
+#### Heatmap
+
+Use to create a grid-based visualizations where you want to represent values in a two-dimensional space.
+
+```{r}
+diamonds %>% 
+  count(color, cut) %>%  
+  mutate(color = fct_rev(color)) %>%
+  ggplot(aes(x = color, y = cut)) +
+  geom_tile(aes(fill = n))
+```
+
+## For fun
+
+Here are examples of a mosaic plot and a 2d density plot.
+
+#### Mosaic plot
+
+A mosaic plot is a graphical representation of the relationship between two or more categorical variables.
+
+```{r}
+library(vcd)
+
+# make a contingency table
+diamond_table <- table(diamonds$cut, diamonds$color)
+
+# build the mosaic plot
+mosaic(diamond_table, 
+       xlab = "Cut", 
+       ylab = "Color", 
+       shade = TRUE) # throws an error, but still works. see if you can figure it out
+```
+
+#### 2D Density Plot
+
+Use this to visualize the density of points in a two-dimensional space.
+
+```{r}
+ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_density2d()
+
+ggplot(data = diamonds, aes(x = carat, y = price, color = cut)) +
+  geom_density2d()
+```

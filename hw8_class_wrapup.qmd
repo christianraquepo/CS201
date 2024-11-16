@@ -1,0 +1,86 @@
+---
+title: "Homework 8: Class Wrap-up"
+format: html
+editor: visual
+---
+
+## Homework 8: Class Wrap-up
+
+We are finally at the end of the semester! The final homework for the class will be to summarize and share some of the things we've done so far.
+
+The plan is for everyone to be randomly paired with a tiny topic pertaining to something we've learned together this semester and then submit a code snippet to be presented in class on Wednesday, 11/20.
+
+#### Libraries
+
+```{r, message=FALSE}
+library(tidyverse)
+library(here)
+```
+
+#### Read in the list of topics
+
+```{r, message=FALSE}
+topics <- read_csv("cs201_topics.csv")
+view(topics)
+
+# anything to edit?
+#topics[#, "topic"] <- 
+```
+
+#### Read in the list of student names
+
+```{r, message=FALSE}
+names <- read_csv("cs201_names.csv")
+view(names)
+```
+
+#### Generate a random number in the names dataframe
+
+```{r, message=FALSE}
+names <- names %>%
+  mutate(number = sample(1:8, nrow(names), replace = FALSE))
+
+view(names)
+```
+
+#### Join the names to the topics
+
+```{r, message=FALSE}
+assigned_topics <- names %>%
+  full_join(topics, by = "number")
+
+view(assigned_topics)
+```
+
+### Instructions
+
+1.  Find your assigned topic. Talk to me if you reeeeeeaaaally want to do something else, or trade with someone (but let me know).
+
+2.  Prepare a code snippet that briefly (2-3 mins) explains the topic in the code chunk below, using `penguins` data.
+
+3.  Push to GitHub BY NOON on Wednesday 11/20 (I'll need time to download and compile before class).
+
+4.  Come to class next Wednesday and show us how it's done :)
+
+#### Extra libraries needed (if any)
+
+```{r, message=FALSE}
+library(janitor)
+
+```
+
+#### Read in penguins data
+
+```{r, message=FALSE}
+penguins <- read_csv(here("data/penguins_lter.csv"))
+
+penguins <- penguins %>% 
+  clean_names()
+```
+
+#### {Insert topic here}
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```

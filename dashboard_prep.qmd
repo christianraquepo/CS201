@@ -1,0 +1,107 @@
+---
+title: "Dashboard Prep"
+format: html 
+editor: visual
+---
+
+## HW #7: Dashboard Prep
+
+You've looked at different types of data, conducted exploratory data analysis, manipulated data with dplyr and other tidy methods, created maps.... Now it's time to think about your flexdashboard final project!
+
+## Data
+
+What data are you planning to use? Describe the data here and read it in below.
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+library(ggplot2)
+```
+
+```{r}
+studentdata <- read_csv(here("FALL 24/CS201/data/Scores.csv"))
+
+studentdata <- studentdata %>%
+  clean_names()
+```
+
+## Variables of interest
+
+Which variables are interesting to you? What kinds of questions will you be asking as you look into this data? What story is your data telling? Please include three questions here. The code chunk below is optional.
+
+1.  *RELATIONSHIP BETWEEN WEEKLY STUDY HOURS AND SUBJECT SCORES.*
+
+2.  *WHAT PERCENTAGE OF STUDENTS FALL INTO DIFFERENT ETHNIC GROUPS, LUNCH TYPES, SPORTS, TRANSPORTATION MEANS.*
+
+3.  *RELATIONSHIP BETWEEN PARENT'S EDUCATION AND SUBJECT SCORES.*
+
+## Plots
+
+You can present plots as "answers" to your exploratory questions above. You'll need to generate at least three types of plots to put on your dashboard. At least one of them should be interactive using plotly or girafe. Test them out here, include the accompanying questions that they answer, and explain why/how the plot answers that question.
+
+These can look really basic right now. We'll talk more about themes and layers next week.
+
+#### *BOXPLOTS*
+
+```{r}
+ggplot(studentdata, aes(y = math_score)) +
+  geom_boxplot()
+
+ggplot(studentdata, aes(y = reading_score)) +
+  geom_boxplot()
+
+ggplot(studentdata, aes(y = writing_score)) +
+  geom_boxplot()
+```
+
+#### *BARCHARTS*
+
+```{r}
+ggplot(studentdata, aes(x = test_prep)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = ethnic_group)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = lunch_type)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = parent_marital_status)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = practice_sport)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = transport_means)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = wkly_study_hours)) +
+  geom_bar()
+
+ggplot(studentdata, aes(x = parent_educ)) + 
+  geom_bar()
+```
+
+```{r}
+ggplot(studentdata, aes(x = parent_educ, y = math_score)) + 
+   geom_line(stat = "summary", fun = mean, group = 1)
+
+ggplot(studentdata, aes(x = parent_educ, y = reading_score)) + 
+   geom_line(stat = "summary", fun = mean, group = 1)
+
+ggplot(studentdata, aes(x = parent_educ, y = writing_score)) + 
+   geom_line(stat = "summary", fun = mean, group = 1)
+```
+
+## flexdashboards
+
+Do some research online about what flexdashboards are and what they look like. See if you can find some examples of existing dashboards and layouts. Describe here what single-page layout(s) you want to try.
+
+Please make sure you include space for at least three plots and at least one descriptive panel.
+
+**Important note**: You'll find some pretty neat interactive dashboards that incorporate shiny apps. We will not be covering that in this class, so please don't attempt it (...unless you really want to?)
+
+What projects have you found that look nice/doable?
+
+What layout(s) do you think you want to apply?
