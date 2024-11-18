@@ -65,8 +65,12 @@ view(assigned_topics)
 #### Extra libraries needed (if any)
 
 ```{r, message=FALSE}
+library(tidyverse)
 library(janitor)
-
+library(here)
+library(palmerpenguins)
+library(plotly)
+library(DataExplorer) 
 ```
 
 #### Read in penguins data
@@ -81,6 +85,12 @@ penguins <- penguins %>%
 #### {Insert topic here}
 
 ```{r, message=FALSE}
-# insert code snippet here
+#mean_make_mpg <- mtcars_split %>%
+  #group_by(make) %>%
+  #summarise(mean_mpg = mean(mpg))
+
+individ_culmen_length <- penguins %>%
+  group_by(individual_id) %>%
+  summarize(culmen_length_mm)
 
 ```
