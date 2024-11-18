@@ -1,7 +1,7 @@
 ---
 title: "Dashboard Prep"
 format: html 
-editor: visual
+editor: visual 
 ---
 
 ## HW #7: Dashboard Prep
