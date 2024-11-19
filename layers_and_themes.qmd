@@ -1,0 +1,269 @@
+---
+title: "Layers and Themes"
+author: "Amber Camp"
+format: html
+editor: visual
+---
+
+## ggplot layers and themes!
+
+Let's explore layers in ggplot and what that means. We'll briefly talk about how you can edit different attributes of your plots to make them look just how you'd like. We'll also make our own individual custom themes.
+
+Here is some more information about layers: <https://r4ds.hadley.nz/layers>
+
+#### Libraries
+
+```{r, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+#### Data
+
+We are using built-in mpg data today!
+
+```{r, message=FALSE}
+data(mpg)
+view(mpg)
+
+# btw, if you ever manipulate your data and want to save it as a new csv use this write.csv
+# there are a few different options, but this is the basic form
+mpg_2000 <- mpg %>% 
+  filter(year > 2000)
+
+#write.csv(datafame_name, "filename.csv")
+write.csv(mpg_2000, "data/mpg_2000.csv")
+mpg_2000 <- read_csv("data/mpg_2000.csv")
+```
+
+#### Looking at layers in a simple plot
+
+```{r, message=FALSE}
+ggplot(mpg, aes(x=displ, y=hwy)) + # data & aes layers
+  geom_point(aes(color=class)) + # geometry/graphical representation layer
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") # labels layer
+```
+
+#### Add a layer
+
+```{r, message=FALSE}
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) + 
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  geom_smooth(method="lm", se=FALSE, color="black") 
+
+# you can reorganize the layers
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_smooth(method="lm", se=FALSE, color="black") +
+  geom_point(aes(color=class)) + 
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") 
+```
+
+#### Adding layers to a finished plot
+
+```{r, message=FALSE}
+car_class <- ggplot(mpg) + 
+  geom_bar(
+    mapping = aes(x = manufacturer, fill = class),
+    width = 1) + 
+  theme(aspect.ratio = 1) + # this sets the x & y scaling to match (makes the plot a square)
+  scale_fill_brewer(palette = "Set3")
+
+car_class
+car_class + coord_flip()
+car_class + coord_polar()
+
+# another version, looking at manufacturer and model. colors are default
+car_models <- ggplot(mpg) + 
+  geom_bar(
+    mapping = aes(x = manufacturer, fill = model), 
+    show.legend = FALSE, # suppress the legend from showing
+    width = 1) + 
+  theme(aspect.ratio = 1) 
+
+car_models
+car_models + coord_flip()
+car_models + coord_polar()
+```
+
+#### Using ggsave
+
+Using ggsave, you can save a high-quality version of your ggplots into various formats. You can designate a certain size (in inches, etc.) and resolution (dpi) as well.
+
+```{r, message=FALSE}
+# ggsave("car_models.png", plot = car_models, width = 6, height = 4, dpi = 300)
+ggsave("car_models.png", plot = car_models)
+
+# put the filename you want to save it as in quotes
+# the file extension on the filename tells R how to save it (png, pdf, jpg)
+# will save to whatever folder you're in, unless you specify
+# if you don't designate which plot to save, it will just save the last plot generated
+# width, height, or dpi are optional, but use them to your advantage
+```
+
+#### Note:
+
+A TON can be done cosmetically with your plots. You can change colors, text, add annotations, add labels, change the direction of text, change the aspect ratios, etc., etc. We won't have time to cover it all in class, but there is lots of documentation online!
+
+### Themes as layers
+
+#### Add a theme
+
+Check out basic ggplot themes here: <https://ggplot2.tidyverse.org/reference/ggtheme.html>
+
+```{r, message=FALSE}
+# what themes have you seen used?
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) + 
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  geom_smooth(method="lm", se=FALSE, color="black") +
+  theme_dark()
+```
+
+#### ggthemes
+
+The package `ggthemes` gives you access to additional, fancier themes. <https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/>
+
+```{r, message=FALSE}
+install.packages("ggthemes")
+library(ggthemes)
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) + 
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  geom_smooth(method="lm", se=FALSE, color="black") +
+  theme_solarized()
+```
+
+#### You can create your own themes, too!
+
+```{r, message=FALSE}
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG")
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  theme(panel.background = element_rect(fill = "lightblue"),
+  plot.background = element_rect(fill = "white"),
+  axis.text = element_text(size = 12, color = "slateblue", face = "italic"),
+  axis.title = element_text(size = 14, face = "bold"),
+  plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+  panel.grid.major = element_line(color = "grey", size = 0.5),
+  panel.grid.minor = element_line(color = "lightgrey", size = 0.25))
+
+# save customizations to a custom theme
+custom_theme <- theme(
+  panel.background = element_rect(fill = "lightblue"),
+  plot.background = element_rect(fill = "white"),
+  axis.text = element_text(size = 12, color = "blue", face = "italic"),
+  axis.title = element_text(size = 14, face = "bold"),
+  plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+  panel.grid.major = element_line(color = "grey", size = 0.5),
+  panel.grid.minor = element_line(color = "lightgrey", size = 0.25))
+
+# generate the plot again, this time with the custom theme!
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG")
+
+
+# you can apply this to other plots, too!
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_boxplot(aes(color=class))
+
+# you can also combine this with other existing themes
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_boxplot(aes(color=class)) 
+```
+
+Quick note: the above is a *static theme*. You create it and use it as is.
+
+Below, we will make a *dynamic* theme. You create it, but leave some variables open to later changes.
+
+```{r, message=FALSE}
+my_dynamic_theme <- function(panel_bg = "lightyellow") {
+  theme(
+    panel.background = element_rect(fill = panel_bg),
+    plot.background = element_rect(fill = "white"),
+    axis.text = element_text(size = 14, color = "purple"),
+    axis.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 18, face = "italic", hjust = 0.5),
+    panel.grid.major = element_line(color = "grey", size = 0.5),
+    panel.grid.minor = element_line(color = "lightgrey", size = 0.25))}
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  my_dynamic_theme()
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  my_dynamic_theme(panel_bg = "lightblue") # edit variables here
+
+# can also layer with other themes, as long as the properties don't cancel each other out
+```
+
+### extrafont
+
+extrafont is a package that allows you to load in fonts from your computer and then use those in R.
+
+```{r, message=FALSE}
+#install.packages("extrafont")
+library(extrafont)
+
+# import fonts (you need to do this only once)
+# it takes quite a while, so don't do it until you're ready
+#font_import()  
+#loadfonts(device = "pdf")  # "win" on Windows, or "pdf" on MacOS/Linux
+
+# in this example, I'm applying multiple fonts and colors.
+# it's not pretty, but I think it illustrates the functionality well :)
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "Comic Sans MS", size = 18, color = "orange", face = "bold", hjust = 0.5),
+    axis.title = element_text(family = "Times New Roman", size = 14, face = "italic"),
+    axis.text = element_text(family = "Courier New", size = 12, color = "red", face = "bold"),
+    legend.title = element_text(family = "Bauhaus 93", size = 16, hjust = 0.5),
+    legend.text = element_text(family = "Zapfino", size = 12)
+  )
+
+```
+
+### If there is time...
+
+Try your hand at generating a basic plot, then adding customizations to it! You can use the mpg package for now. Maybe you can create a super basic custom theme and apply it to different plots!
+
+```{r, message=FALSE}
+
+green_title <- theme(
+    plot.title = element_text(size = 20, color = "forestgreen", face = "italic", hjust = 0.5))
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") +
+  green_title
+```
+
+```{r}
+blue_title <- theme(
+    plot.title = element_text(size = 20, color = "steelblue", face = "italic", hjust = 0.5)) 
+
+ggplot(mpg, aes(x=displ, y=hwy)) +
+  geom_point(aes(color=class)) +
+  labs(title="Engine Displacement vs. Highway MPG", x="Displacement (L)", y="Highway MPG") + 
+  theme_solarized() +
+  theme(
+    plot.title = element_text(size = 18, color = "steelblue", face = "bold", hjust = 0.5),
+    axis.title = element_text(family = "Courier New", size = 14, color = "navyblue"),
+    axis.text = element_text(family = "Courier New", size = 12, color = "navy"),
+    legend.title = element_text(size = 16, hjust = 0.5),
+    legend.text = element_text(size = 12)
+  )
+  blue_title
+```

@@ -82,7 +82,7 @@ penguins <- penguins %>%
   clean_names()
 ```
 
-#### {Insert topic here}
+#### Summarize 
 
 ```{r, message=FALSE}
 #mean_make_mpg <- mtcars_split %>%
@@ -93,4 +93,8 @@ individ_culmen_length <- penguins %>%
   group_by(individual_id) %>%
   summarize(culmen_length_mm)
 
+```
+
+```{r}
+#mean culment length by island 
 ```
